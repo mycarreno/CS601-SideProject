@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Hotel Info</title>
+
+</head>
+<body style="height:1500px">
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/welcome">User Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/hotelSearch">Hotel Search</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/reviewSearch">Review Search</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/linkHistory">Link History</a>
+        </li>
+    </ul>
+</nav>
+
+
+
+<h3>Hotel Info</h3>
+<p>Name: $hotel.name</p>
+<p>Address: $hotel.street, $hotel.city, #if($hotel.province != $null) $hotel.province, #end $hotel.country</p>
+
+<h4 id="hotelSaved"></h4>
+<input type="hidden" value="$hotel.id" id="hotelId">
+<button id="save" onclick="saveHotel()">Save Hotel</button>
+<!--
+<p>Save Hotel</p>
+<form class="form-horizontal" action="/hotelInfo" method="post">
+    <input type="hidden" name="saveHotel" value="$hotel.id"/>
+    <button class="save" type="submit">Save Hotel</button>
+</form>
+-->
+
+<fieldset>
+    <legend>Add Review:</legend>
+        <form class="form-horizontal" action="/hotelInfo" method="post">
+            <input type="hidden" id="id" name="id" value="$hotel.id">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="title">Title:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="title" name="title">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="text">Review:</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" rows="5" id="text" name="text"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Add Review</button>
+        </form>
+</fieldset>
+
+<p>Reviews:</p>
+#if(!$reviews.isEmpty())
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Hotel Name</th>
+            <th>User</th>
+            <th>Review Title</th>
+            <th>Review Text</th>
+            <th>Date</th>
+            <th># of Users Found This Helpful</th>
+        </tr>
+        </thead>
+        <tbody>
+        #foreach($review in $reviews)
+        <tr>
+            <td>$review.name</td>
+            <td>$review.user</td>
+            <td>$review.title</td>
+            <td>$review.text</td>
+            <td>$review.date</td>
+            <td><button id="like" onclick="likeReview(this)"
+                        value="$review.review_id">$review.likes</button></td>
+        </tr>
+        #end
+        </tbody>
+    </table>
+#else
+    <p>No Reviews Found</p>
+#end
+
+<script>
+    function likeReview(elem){
+        var xhttp = new XMLHttpRequest();
+        var params = "like=" + elem.value + "&id=" + document.getElementById("hotelId").value;
+        xhttp.open("POST", "hotelInfo", true);
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                var jsonObj = JSON.parse(xhttp.responseText);
+                var message = jsonObj.likes;
+                console.log(message);
+                elem.innerHTML = message
+            }
+        };
+        xhttp.send(params);
+    }
+
+    function saveHotel(){
+        var xhttp = new XMLHttpRequest();
+        var params = "saveHotel=" + document.getElementById("hotelId").value;
+        xhttp.open("POST", "hotelInfo", true);
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                var jsonObj = JSON.parse(xhttp.responseText);
+                var message = jsonObj.hotelSaved;
+                console.log(message);
+                if(message){
+                    document.getElementById("hotelSaved").innerHTML = "The hotel has been saved";
+                }
+                else {
+                    document.getElementById("hotelSaved").innerHTML = "This hotel is already saved";
+                }
+            }
+        };
+        xhttp.send(params);
+    }
+</script>
+
+</body>
+</html>

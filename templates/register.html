@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Register</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body style="height:1500px">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/register">Register</a>
+        </li>
+    </ul>
+</nav>
+
+<fieldset>
+    <legend><h3>User Registration</h3></legend>
+        <form class="form-inline" action="/register" method="post">
+            <label for="uname" class="mr-sm-2">Username:</label>
+            <input type="text" class="form-control mb-2 mr-sm-2" id="uname" name="uname">
+            <label for="pwd" class="mr-sm-2">Password:</label>
+            <input type="password" class="form-control mb-2 mr-sm-2" id="pwd" name="pwd" onkeyup="vp()">
+            <button type="submit" class="btn btn-primary mb-2" id="button">Submit</button>
+        </form>
+</fieldset>
+<h4>Password Requirements</h4>
+<ul>
+    <li id="length" style="color: red;">Must be between 5 and 10 character long</li>
+    <li id="letter" style="color: red;">Must contain at least one letter</li>
+    <li id="number" style="color: red;">Must contain at least one number</li>
+    <li id="special" style="color: red;">Must contain at least one special character</li>
+</ul>
+
+#if($regError != $null)
+    <strong><p style="color: red;">Username is not available!</p></strong>
+#end
+<script>
+    function vp() {
+        var pass = document.getElementById("pwd").value;
+        if (pass.match("[0-9]+")) {
+            document.getElementById("number").style.color = "green";
+        } else {document.getElementById("number").style.color = "red";}
+
+        if (pass.match("[a-zA-Z]+")) {
+            document.getElementById("letter").style.color = "green";
+        } else {document.getElementById("letter").style.color = "red";}
+
+        if (pass.match("[^0-9a-zA-Z]+")) {
+            document.getElementById("special").style.color = "green";
+        } else {document.getElementById("special").style.color = "red";}
+
+        if (pass.length >= 5 && pass.length <= 10) {
+            document.getElementById("length").style.color = "green";
+        } else {document.getElementById("length").style.color = "red";}
+    }
+
+    document.getElementById("button").addEventListener("click",
+        function(event){
+            var c1 = document.getElementById("letter").style.color;
+            var c2 = document.getElementById("special").style.color;
+            var c3 = document.getElementById("number").style.color;
+            var c4 = document.getElementById("length").style.color;
+
+            if(c1 != "green" || c2 != "green" || c3 != "green" || c4 != "green"){
+                event.preventDefault();
+                alert("Password does not meet requirements!");
+            }
+    });
+</script>
+</body>
+</html>
